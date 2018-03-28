@@ -24,6 +24,6 @@ The rules are as follows:
 	
 	Players that Hit the Knee Exactly may split the dice by doubling their bet
 	
-	When splitting,players roll one additional die per split, normal rules apply
+	When splitting, players roll one additional die per split, normal rules apply
 	
 	The player may split a second time if they wish to become legendary
