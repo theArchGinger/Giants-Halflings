@@ -144,6 +144,57 @@ void test_RNG()
 		cout<<j+1<<"s: "<<results[j]<<"\n";
 }
 
+/*
+void setup_game()
+{
+	int half1;
 
+	// select difficulty (starting money (easy, medium, hard, custom))
+	
+	// get player bet
+	
+	// roll one halfling
+	half1 = 
+
+	// start the rest of the game
+	play_game(half1)
+}
+
+void play_game(int half1) // recursive function to handle splitting TODO bet and purse
+{
+	bool is_splitting;
+
+	// roll giant
+	
+	// check for kick
+	
+	// roll other halfling
+	
+	// check for maw
+	
+	// check for snake
+	
+	// check for possible split
+	if(half1+half2 == giant)
+	{
+		cout<<"You hit the Knee exactly! Would you like to split? (y for yes, n for no): "
+		cin>>is_splitting;
+		if(is_splitting)
+			play_game(half1);
+			cout<<"\nNow for the other half of the split\n";
+			play_game(half2);
+	}
+
+	// check for win
+	
+	// else loss
+	
+}
+
+test_game() // imagine a dark game... basicly test_RNG for play_game
+{
+	play_game with an additional boolean argument for user input?
+}
+ */
 
 
