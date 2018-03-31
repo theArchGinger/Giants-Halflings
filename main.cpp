@@ -147,29 +147,43 @@ void test_RNG()
 /*
 void setup_game()
 {
+	unsigned int purse, bet;
 	int half1;
+
+	std::mt19937 generator((unsigned int) time(0)); // seed number generator
+	std::uniform_real_distribution<double> half_roller(1, 7);
 
 	// select difficulty (starting money (easy, medium, hard, custom))
 	
+
 	// get player bet
 	
+
 	// roll one halfling
-	half1 = 
+	half1 = (int) half_roller(generator);
 
 	// start the rest of the game
-	play_game(half1)
+	play_game(purse, bet, half1, false);
 }
 
-void play_game(int half1) // recursive function to handle splitting TODO bet and purse
+void play_game(unsigned int purse, unsigned int bet, int half1, bool ask_user) // recursive function to handle splitting
 {
 	bool is_splitting;
+	int half2, giant;
+
+	std::mt19937 generator((unsigned int) time(0)); // seed number generator
+	std::uniform_real_distribution<double> giant_roller(1, 11);
+	std::uniform_real_distribution<double> half_roller(1, 7);
 
 	// roll giant
-	
+	giant = (int) giant_roller(generator);
+
 	// check for kick
 	
+
 	// roll other halfling
-	
+	half2 = (int) half_roller(generator);
+
 	// check for maw
 	
 	// check for snake
@@ -177,6 +191,9 @@ void play_game(int half1) // recursive function to handle splitting TODO bet and
 	// check for possible split
 	if(half1+half2 == giant)
 	{
+		// check if player has enough money in purse to split
+		
+
 		cout<<"You hit the Knee exactly! Would you like to split? (y for yes, n for no): "
 		cin>>is_splitting;
 		if(is_splitting)
@@ -193,7 +210,25 @@ void play_game(int half1) // recursive function to handle splitting TODO bet and
 
 test_game() // imagine a dark game... basicly test_RNG for play_game
 {
-	play_game with an additional boolean argument for user input?
+	//play_game with an additional boolean argument for user input?
+	unsigned int purse, bet;
+	int half1;
+
+	std::mt19937 generator((unsigned int) time(0)); // seed number generator
+	std::uniform_real_distribution<double> half_roller(1, 7);
+
+	cout<<"Enter starting purse amount: ";
+	cin>>purse;
+
+	cout<<"\nEnter bet amount: "
+	cin>>bet;
+
+	half1 = (int) half_roller(generator);
+
+	cout<<"\nWould you like to split every ime it is possible? 'y' for yes, 'n' for no: ";
+	cin>>is_splitting
+
+	play_game(purse, bet, half1, true);
 }
  */
 
