@@ -20,7 +20,7 @@
 /*
  * Assuming you're using a UNIX system with g++ installed
  * to compile:
- * g++ main.cpp -o gnh -std=c++11
+ * make
  * 
  * to run:
  * ./gnh
@@ -34,6 +34,11 @@
 
 using std::cout;
 using std::cin;
+
+
+#define EASY_AMOUNT 	500
+#define MEDIUM_AMOUNT 	250
+#define HARD_AMOUNT		100
 
 
 void print_rules(void);
@@ -136,7 +141,8 @@ void test_RNG()
 	for(int i=0; i<num_trials; i++) // for the number of trials
 	{
 		results[((int) dis(generator))-1]++; // increment the result of the number "rolled"
-		//cout<<dis(generator)<<"\n";
+		//cout<<dis(generator)<<"\n"; // uncomment to print all generated numbers
+		//cout<<(int) dis(generator)<<"\n"; // uncomment to print all generated numbers cast as int
 	}
 
 	cout<<"\nResults:\n";
@@ -152,6 +158,7 @@ void setup_game()
 
 	std::mt19937 generator((unsigned int) time(0)); // seed number generator
 	std::uniform_real_distribution<double> half_roller(1, 7);
+	std::uniform_real_distribution<double> giant_roller(1, 11);
 
 	// select difficulty (starting money (easy, medium, hard, custom))
 	
@@ -162,21 +169,21 @@ void setup_game()
 	// roll one halfling
 	half1 = (int) half_roller(generator);
 
+	// roll giant
+	giant = (int) giant_roller(generator);
+
 	// start the rest of the game
-	play_game(purse, bet, half1, false);
+	play_game(purse, bet, half1, false, false);
 }
 
-void play_game(unsigned int purse, unsigned int bet, int half1, bool ask_user) // recursive function to handle splitting
+void play_game(unsigned int purse, unsigned int bet, int half1, int giant, bool ask_user, is_splitting)
+// recursive function to handle splitting
 {
 	bool is_splitting;
 	int half2, giant;
 
 	std::mt19937 generator((unsigned int) time(0)); // seed number generator
-	std::uniform_real_distribution<double> giant_roller(1, 11);
 	std::uniform_real_distribution<double> half_roller(1, 7);
-
-	// roll giant
-	giant = (int) giant_roller(generator);
 
 	// check for kick
 	
@@ -211,24 +218,40 @@ void play_game(unsigned int purse, unsigned int bet, int half1, bool ask_user) /
 test_game() // imagine a dark game... basicly test_RNG for play_game
 {
 	//play_game with an additional boolean argument for user input?
-	unsigned int purse, bet;
+	unsigned int purse, bet, trials;
 	int half1;
 
 	std::mt19937 generator((unsigned int) time(0)); // seed number generator
 	std::uniform_real_distribution<double> half_roller(1, 7);
+	std::uniform_real_distribution<double> giant_roller(1, 11);
 
 	cout<<"Enter starting purse amount: ";
-	cin>>purse;
+	cin>>start_purse;
 
 	cout<<"\nEnter bet amount: "
 	cin>>bet;
 
-	half1 = (int) half_roller(generator);
-
 	cout<<"\nWould you like to split every ime it is possible? 'y' for yes, 'n' for no: ";
 	cin>>is_splitting
 
-	play_game(purse, bet, half1, true);
+	<cout<<"Wnternumberof games to play: ";
+	cin>>trials;
+
+	for(; trials>0; trials--)
+	{
+		// roll giant
+		giant = (int) giant_roller(generator);
+
+		// roll halfling
+		half1 = (int) half_roller(generator);
+
+		play_game(purse, bet, half1, giant, false, is_splitting);
+	}
+
+	// print results
+	//cout<<"\nstarting purse: "<<start_purse<<"\n";
+	
+	// this might have to wait for implmentation of more complex data structures
 }
  */
 
