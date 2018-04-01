@@ -45,6 +45,8 @@ void print_rules(void);
 void test_RNG(void);
 unsigned int setup_game(void);
 unsigned int play_game(unsigned int start_purse, unsigned int bet, int half1, int giant, bool ask_user, bool is_splitting);
+unsigned int do_win(unsigned int purse, unsigned int bet, int giant);
+unsigned int do_loss(unsigned int purse, unsigned int bet);
 
 
 int main(void)
@@ -153,7 +155,7 @@ void test_RNG()
 unsigned int setup_game()
 {
 	unsigned int start_purse, bet, end_purse;
-	char diff;
+	int diff;
 	int half1, giant;
 
 	std::mt19937 generator((unsigned int) time(0)); // seed number generator
@@ -166,7 +168,7 @@ unsigned int setup_game()
 	cout<<"\nMedium:  "<<MEDIUM_AMOUNT;
 	cout<<"\nHard:    "<<HARD_AMOUNT;
 	cout<<"\nOr a Custom Amount";
-	cout<<"\n\nEnter 1 for easy, 2 for medium, 3 for hard, and 4 for a custom amount: ";
+	cout<<"\n\nEnter 1 for easy, 2 for medium, 3 for hard, or 4 for a custom amount: ";
 	cin>>diff;
 
 	switch(diff)
@@ -181,7 +183,7 @@ unsigned int setup_game()
 			start_purse = HARD_AMOUNT;
 			break;
 		case(4):
-			cout<<"\nEnter a starting purse amount: ";
+			cout<<"Enter a starting purse amount: ";
 			cin>>start_purse;
 			break;
 		default:
@@ -203,7 +205,7 @@ unsigned int setup_game()
 	end_purse = play_game(start_purse, bet, half1, giant, false, false);
 
 	// print ending
-	cout<<"Your purse is now "<<end_purse<<".\n";
+	cout<<"Your purse is now "<<end_purse<<".\n"; // TODO continue playing
 
 	return end_purse;
 }
@@ -217,36 +219,76 @@ unsigned int play_game(unsigned int start_purse, unsigned int bet, int half1, in
 	std::mt19937 generator((unsigned int) time(0)); // seed number generator
 	std::uniform_real_distribution<double> half_roller(1, 7);
 
+	cout<<"\nThe Giant is "<<giant<<"\n";
 	// check for kick
-	
-
-	// roll other halfling
-	half2 = (int) half_roller(generator);
-
-	// check for maw
-	
-	// check for snake
-	
-	// check for possible split
-	if(half1+half2 == giant)
+	if(giant == 1)
 	{
-		// check if player has enough money in purse to split
-		
+		cout<<"The Giant kicked! House wins.";
+		end_purse = do_loss(start_purse, bet);
+	}
+	else
+	{
+		// roll other halfling
+		half2 = (int) half_roller(generator);
+		cout<<"Halfling 1: "<<half1;
+		cout<<"\nHalfling 2: "<<half2<<"\n";
 
-		cout<<"You hit the Knee exactly! Would you like to split? (y for yes, n for no): ";
-		cin>>is_splitting;
-		if(is_splitting)
-			inter_purse = (start_purse, bet, half1, giant, ask_user, is_splitting);
-			cout<<"\nNow for the other half of the split\n";
-			play_game(inter_purse, bet, half2, giant, ask_user, is_splitting);
+		// check for snake
+		if( (half1 == 1) && (half2 == 1) )
+		{
+			cout<<"A snake scared the Giant!\n";
+			end_purse = do_win(start_purse, bet, giant);
+		}
+		// check for maw
+		else if( (half1+half2) >= 11)
+		{
+			cout<<"The halflings were eaten by the Maw!\n";
+			end_purse = do_loss(start_purse, bet);
+		}
+		// check for possible split
+		else if( (half1+half2) == giant)
+		{
+			// check if player has enough money in purse to split
+			
+
+			cout<<"You hit the Knee exactly! Would you like to split? (y for yes, n for no): ";
+			cin>>is_splitting;
+			if(is_splitting)
+			{
+				inter_purse = (start_purse, bet, half1, giant, ask_user, is_splitting);
+				cout<<"\nNow for the other half of the split";
+				play_game(inter_purse, bet, half2, giant, ask_user, is_splitting);
+			}
+			cout<<"\n";
+		}
+		// check for win
+		else if( (half1+half2) > giant)
+		{
+			cout<<"You win!\n";
+			end_purse = do_win(start_purse, bet, giant);
+		}
+		// else loss
+		else
+		{
+			cout<<"You lost.\n";
+			end_purse = do_loss(start_purse, bet);
+		}
 	}
 
-	// check for win
-	
-	// else loss
-	
-
 	return end_purse;
+}
+
+unsigned int do_win(unsigned int purse, unsigned int bet, int giant)
+{
+	return purse+(bet*giant); //TODO actually do the payout in the rules
+}
+
+unsigned int do_loss(unsigned int purse, unsigned int bet)
+{
+	/*unsigned int end_purse = purse - bet;
+	cout<<"You now have "<<end_purse<<" coins remaining.\n";
+	return end_purse;*/
+	return purse-bet;
 }
 /*
 test_game() // imagine a dark game... basicly test_RNG for play_game
