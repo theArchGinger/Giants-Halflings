@@ -43,12 +43,15 @@ using std::cin;
 
 void print_rules(void);
 void test_RNG(void);
+unsigned int setup_game(void);
+unsigned int play_game(unsigned int start_purse, unsigned int bet, int half1, int giant, bool ask_user, bool is_splitting);
 
 
 int main(void)
 {
 	char selection; // user entered char to selet menu item
 	bool quit_game = false;
+	unsigned int prev_purse;
 
 	// print starting info
 	cout<<"Welcome to Giants & Halflings";
@@ -77,13 +80,10 @@ int main(void)
 				test_RNG();
 				break;
 			case('s'):
-				//has_played_game = true;
-				//startGame(game_diff, purse);
-				//game_diff = changeDiff(game_diff);
 				/*do
-				{
-					startGame(game_diff);
-					cout<<"Would you like to keep playing? Either enter a bet, or 'n': ";
+				{*/
+					prev_purse = setup_game();
+					/*cout<<"Would you like to keep playing? Either enter 'y" or 'n': ";
 					cin>>keep_playing;
 				}while(keep_playing != 'n');*/
 				break;
@@ -150,21 +150,48 @@ void test_RNG()
 		cout<<j+1<<"s: "<<results[j]<<"\n";
 }
 
-/*
-void setup_game()
+unsigned int setup_game()
 {
-	unsigned int purse, bet;
-	int half1;
+	unsigned int start_purse, bet, end_purse;
+	char diff;
+	int half1, giant;
 
 	std::mt19937 generator((unsigned int) time(0)); // seed number generator
 	std::uniform_real_distribution<double> half_roller(1, 7);
 	std::uniform_real_distribution<double> giant_roller(1, 11);
 
 	// select difficulty (starting money (easy, medium, hard, custom))
-	
+	cout<<"\nInitial coin amounts per dificulty:\n";
+	cout<<"Easy:    "<<EASY_AMOUNT;
+	cout<<"\nMedium:  "<<MEDIUM_AMOUNT;
+	cout<<"\nHard:    "<<HARD_AMOUNT;
+	cout<<"\nOr a Custom Amount";
+	cout<<"\n\nEnter 1 for easy, 2 for medium, 3 for hard, and 4 for a custom amount: ";
+	cin>>diff;
+
+	switch(diff)
+	{
+		case(1):
+			start_purse = EASY_AMOUNT;
+			break;
+		case(2):
+			start_purse = MEDIUM_AMOUNT;
+			break;
+		case(3):
+			start_purse = HARD_AMOUNT;
+			break;
+		case(4):
+			cout<<"\nEnter a starting purse amount: ";
+			cin>>start_purse;
+			break;
+		default:
+			start_purse = EASY_AMOUNT;
+	}
+	cout<<"You now have "<<start_purse<<" coins.";
 
 	// get player bet
-	
+	cout<<"\n\nHow many would you like to wager?\n";
+	cin>>bet;
 
 	// roll one halfling
 	half1 = (int) half_roller(generator);
@@ -173,14 +200,19 @@ void setup_game()
 	giant = (int) giant_roller(generator);
 
 	// start the rest of the game
-	play_game(purse, bet, half1, false, false);
+	end_purse = play_game(start_purse, bet, half1, giant, false, false);
+
+	// print ending
+	cout<<"Your purse is now "<<end_purse<<".\n";
+
+	return end_purse;
 }
 
-void play_game(unsigned int purse, unsigned int bet, int half1, int giant, bool ask_user, is_splitting)
+unsigned int play_game(unsigned int start_purse, unsigned int bet, int half1, int giant, bool ask_user, bool is_splitting)
 // recursive function to handle splitting
 {
-	bool is_splitting;
-	int half2, giant;
+	int half2;
+	unsigned int inter_purse, end_purse;
 
 	std::mt19937 generator((unsigned int) time(0)); // seed number generator
 	std::uniform_real_distribution<double> half_roller(1, 7);
@@ -201,24 +233,26 @@ void play_game(unsigned int purse, unsigned int bet, int half1, int giant, bool 
 		// check if player has enough money in purse to split
 		
 
-		cout<<"You hit the Knee exactly! Would you like to split? (y for yes, n for no): "
+		cout<<"You hit the Knee exactly! Would you like to split? (y for yes, n for no): ";
 		cin>>is_splitting;
 		if(is_splitting)
-			play_game(half1);
+			inter_purse = (start_purse, bet, half1, giant, ask_user, is_splitting);
 			cout<<"\nNow for the other half of the split\n";
-			play_game(half2);
+			play_game(inter_purse, bet, half2, giant, ask_user, is_splitting);
 	}
 
 	// check for win
 	
 	// else loss
 	
-}
 
+	return end_purse;
+}
+/*
 test_game() // imagine a dark game... basicly test_RNG for play_game
 {
 	//play_game with an additional boolean argument for user input?
-	unsigned int purse, bet, trials;
+	unsigned int start_purse, bet, trials, end_purse;
 	int half1;
 
 	std::mt19937 generator((unsigned int) time(0)); // seed number generator
@@ -245,7 +279,7 @@ test_game() // imagine a dark game... basicly test_RNG for play_game
 		// roll halfling
 		half1 = (int) half_roller(generator);
 
-		play_game(purse, bet, half1, giant, false, is_splitting);
+		end_purse = play_game(start_purse, bet, half1, giant, false, is_splitting);
 	}
 
 	// print results
