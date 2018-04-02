@@ -157,19 +157,24 @@ unsigned int setup_game()
 	unsigned int start_purse, bet, end_purse;
 	int diff;
 	int half1, giant;
+	char again;
+	bool play_again;
 
 	std::mt19937 generator((unsigned int) time(0)); // seed number generator
 	std::uniform_real_distribution<double> half_roller(1, 7);
 	std::uniform_real_distribution<double> giant_roller(1, 11);
 
 	// select difficulty (starting money (easy, medium, hard, custom))
-	cout<<"\nInitial coin amounts per dificulty:\n";
-	cout<<"Easy:    "<<EASY_AMOUNT;
-	cout<<"\nMedium:  "<<MEDIUM_AMOUNT;
-	cout<<"\nHard:    "<<HARD_AMOUNT;
-	cout<<"\nOr a Custom Amount";
-	cout<<"\n\nEnter 1 for easy, 2 for medium, 3 for hard, or 4 for a custom amount: ";
-	cin>>diff;
+	do
+	{
+		cout<<"\nInitial coin amounts per dificulty:\n";
+		cout<<"Easy:    "<<EASY_AMOUNT;
+		cout<<"\nMedium:  "<<MEDIUM_AMOUNT;
+		cout<<"\nHard:    "<<HARD_AMOUNT;
+		cout<<"\nOr a Custom Amount";
+		cout<<"\n\nEnter 1 for easy, 2 for medium, 3 for hard, or 4 for a custom amount: ";
+		cin>>diff;
+	}while( (diff < 1) || (diff > 4) );
 
 	switch(diff)
 	{
@@ -188,24 +193,49 @@ unsigned int setup_game()
 			break;
 		default:
 			start_purse = EASY_AMOUNT;
+			cout<<"unrecognized selection, defaulting to "<<EASY_AMOUNT<<"\n";
 	}
 	cout<<"You now have "<<start_purse<<" coins.";
 
-	// get player bet
-	cout<<"\n\nHow many would you like to wager?\n";
-	cin>>bet;
+	// start game loop
+	do
+	{
+		// get player bet
+		do
+		{
+			cout<<"\n\nHow many would you like to wager?\n";
+			cin>>bet;
+			if(bet > start_purse)
+				cout<<"You don't have enough coins to wager that much.\n";
+		}while(bet > start_purse);
 
-	// roll one halfling
-	half1 = (int) half_roller(generator);
+		// roll one halfling
+		half1 = (int) half_roller(generator);
 
-	// roll giant
-	giant = (int) giant_roller(generator);
+		// roll giant
+		giant = (int) giant_roller(generator);
 
-	// start the rest of the game
-	end_purse = play_game(start_purse, bet, half1, giant, false, false);
+		// start the rest of the game
+		end_purse = play_game(start_purse, bet, half1, giant, false, false);
 
-	// print ending
-	cout<<"Your purse is now "<<end_purse<<".\n"; // TODO continue playing
+		// print ending
+		cout<<"Your purse is now "<<end_purse<<".\n";
+
+		do
+		{
+			cout<<"Would you like to play again?('y' for yes, 'n' for no)\n";
+			cin>>again;
+		}while( (again != 'y') && (again != 'n') );
+		switch(again)
+		{
+			case('y'):
+				play_again = true;
+				break;
+			case('n'):
+				play_again = false;
+				break;
+		}
+	}while(play_again);
 
 	return end_purse;
 }
