@@ -82,18 +82,13 @@ int main(void)
 				test_RNG();
 				break;
 			case('s'):
-				/*do
-				{*/
-					prev_purse = setup_game();
-					/*cout<<"Would you like to keep playing? Either enter 'y" or 'n': ";
-					cin>>keep_playing;
-				}while(keep_playing != 'n');*/
+				prev_purse = setup_game();
 				break;
 			case('g'):
-				//testGame();
+				//testGame(); //TODO implement test_game()
 				break;
 			case('q'):
-				quit_game = true;
+				quit_game = true; //TODO save purse
 				break;
 			default:
 				cout<<"no matching action found, returning to main menu...\n\n";
@@ -154,7 +149,7 @@ void test_RNG()
 
 unsigned int setup_game()
 {
-	unsigned int start_purse, bet, end_purse;
+	unsigned int purse, bet;
 	int diff;
 	int half1, giant;
 	char again;
@@ -179,35 +174,36 @@ unsigned int setup_game()
 	switch(diff)
 	{
 		case(1):
-			start_purse = EASY_AMOUNT;
+			purse = EASY_AMOUNT;
 			break;
 		case(2):
-			start_purse = MEDIUM_AMOUNT;
+			purse = MEDIUM_AMOUNT;
 			break;
 		case(3):
-			start_purse = HARD_AMOUNT;
+			purse = HARD_AMOUNT;
 			break;
 		case(4):
 			cout<<"Enter a starting purse amount: ";
-			cin>>start_purse;
+			cin>>purse;
 			break;
 		default:
-			start_purse = EASY_AMOUNT;
+			purse = EASY_AMOUNT;
 			cout<<"unrecognized selection, defaulting to "<<EASY_AMOUNT<<"\n";
 	}
-	cout<<"You now have "<<start_purse<<" coins.";
+	
 
 	// start game loop
 	do
 	{
+		cout<<"You now have "<<purse<<" coins.";
 		// get player bet
 		do
 		{
 			cout<<"\n\nHow many would you like to wager?\n";
 			cin>>bet;
-			if(bet > start_purse)
+			if(bet > purse)
 				cout<<"You don't have enough coins to wager that much.\n";
-		}while(bet > start_purse);
+		}while(bet > purse);
 
 		// roll one halfling
 		half1 = (int) half_roller(generator);
@@ -216,10 +212,16 @@ unsigned int setup_game()
 		giant = (int) giant_roller(generator);
 
 		// start the rest of the game
-		end_purse = play_game(start_purse, bet, half1, giant, false, false);
+		purse = play_game(purse, bet, half1, giant, true, false);
 
 		// print ending
-		cout<<"Your purse is now "<<end_purse<<".\n";
+		if(purse <= 0)
+		{
+			cout<<"You ran out of money!\n";
+			return purse;
+		}
+		else
+			cout<<"Your purse is now "<<purse<<".\n";
 
 		do
 		{
@@ -237,7 +239,7 @@ unsigned int setup_game()
 		}
 	}while(play_again);
 
-	return end_purse;
+	return purse;
 }
 
 unsigned int play_game(unsigned int start_purse, unsigned int bet, int half1, int giant, bool ask_user, bool is_splitting)
@@ -245,6 +247,7 @@ unsigned int play_game(unsigned int start_purse, unsigned int bet, int half1, in
 {
 	int half2;
 	unsigned int inter_purse, end_purse;
+	char split = 'n';
 
 	std::mt19937 generator((unsigned int) time(0)); // seed number generator
 	std::uniform_real_distribution<double> half_roller(1, 7);
@@ -253,7 +256,7 @@ unsigned int play_game(unsigned int start_purse, unsigned int bet, int half1, in
 	// check for kick
 	if(giant == 1)
 	{
-		cout<<"The Giant kicked! House wins.";
+		cout<<"The Giant kicked!\n";
 		end_purse = do_loss(start_purse, bet);
 	}
 	else
@@ -278,17 +281,20 @@ unsigned int play_game(unsigned int start_purse, unsigned int bet, int half1, in
 		// check for possible split
 		else if( (half1+half2) == giant)
 		{
-			// check if player has enough money in purse to split
+			// TODO check if player has enough money in purse to split
 			
 
 			cout<<"You hit the Knee exactly! Would you like to split? (y for yes, n for no): ";
-			cin>>is_splitting;
-			if(is_splitting)
+			cin>>split;
+			if(split == 'y')
 			{
-				inter_purse = (start_purse, bet, half1, giant, ask_user, is_splitting);
+				cout<<"\nFirst half of the split"; // TODO better explain splitting levels to user
+				inter_purse = play_game(start_purse, bet, half1, giant, ask_user, is_splitting);
 				cout<<"\nNow for the other half of the split";
-				play_game(inter_purse, bet, half2, giant, ask_user, is_splitting);
+				end_purse = play_game(inter_purse, bet, half2, giant, ask_user, is_splitting);
 			}
+			else
+				end_purse = do_win(start_purse, bet, giant);
 			cout<<"\n";
 		}
 		// check for win
@@ -308,16 +314,38 @@ unsigned int play_game(unsigned int start_purse, unsigned int bet, int half1, in
 	return end_purse;
 }
 
-unsigned int do_win(unsigned int purse, unsigned int bet, int giant)
+unsigned int do_win(unsigned int purse, unsigned int bet, int giant)// TODO move printing in this?
 {
-	return purse+(bet*giant); //TODO actually do the payout in the rules
+/*
+ * 	If the Knee is 2-3, House pays 1:1
+ * 	If the Knee is 4-6, House pays 2:1
+ * 	If the Knee is 7-9, House pays 3:1
+ * 	If the Knee is 10, House pays 5:1
+ */
+	switch(giant)
+	{
+		case(2):
+		case(3):
+			return purse+bet;
+		case(4):
+		case(5):
+		case(6):
+			return purse+2*bet;
+		case(7):
+		case(8):
+		case(9):
+			return purse+3*bet;
+		case(10):
+			return purse+5*bet;
+	}
 }
 
-unsigned int do_loss(unsigned int purse, unsigned int bet)
+unsigned int do_loss(unsigned int purse, unsigned int bet)// TODO move printing in this?
 {
 	/*unsigned int end_purse = purse - bet;
 	cout<<"You now have "<<end_purse<<" coins remaining.\n";
 	return end_purse;*/
+	//cout<<"purse: "<<purse<<"\nbet: "<<bet<<"\n";
 	return purse-bet;
 }
 /*
