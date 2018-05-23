@@ -199,7 +199,7 @@ unsigned int setup_game()
 		// get player bet
 		do
 		{
-			cout<<"\n\nHow many would you like to wager?\n";
+			cout<<"\nHow many would you like to wager?\n";
 			cin>>bet;
 			if(bet > purse)
 				cout<<"You don't have enough coins to wager that much.\n";
@@ -225,7 +225,7 @@ unsigned int setup_game()
 
 		do
 		{
-			cout<<"Would you like to play again?('y' for yes, 'n' for no)\n";
+			cout<<"\nWould you like to play again?('y' for yes, 'n' for no)\n";
 			cin>>again;
 		}while( (again != 'y') && (again != 'n') );
 		switch(again)
@@ -281,21 +281,24 @@ unsigned int play_game(unsigned int start_purse, unsigned int bet, int half1, in
 		// check for possible split
 		else if( (half1+half2) == giant)
 		{
-			// TODO check if player has enough money in purse to split
-			
-
-			cout<<"You hit the Knee exactly! Would you like to split? (y for yes, n for no): ";
-			cin>>split;
-			if(split == 'y')
+			// check if player has enough money in purse to split
+			if( (start_purse-2*bet) >= 0)
 			{
-				cout<<"\nFirst half of the split"; // TODO better explain splitting levels to user
-				inter_purse = play_game(start_purse, bet, half1, giant, ask_user, is_splitting);
-				cout<<"\nNow for the other half of the split";
-				end_purse = play_game(inter_purse, bet, half2, giant, ask_user, is_splitting);
+				cout<<"You hit the Knee exactly! Would you like to split? (y for yes, n for no): ";
+				cin>>split;
+				if(split == 'y')
+				{
+					cout<<"\nFirst half of the split"; // TODO better explain splitting levels to user
+					inter_purse = play_game(start_purse, bet, half1, giant, ask_user, is_splitting);
+					cout<<"\nNow for the other half of the split";
+					end_purse = play_game(inter_purse, bet, half2, giant, ask_user, is_splitting);
+				}
+				else
+					end_purse = do_win(start_purse, bet, giant);
+				cout<<"\n";
 			}
 			else
 				end_purse = do_win(start_purse, bet, giant);
-			cout<<"\n";
 		}
 		// check for win
 		else if( (half1+half2) > giant)
